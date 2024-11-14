@@ -1,14 +1,14 @@
-const display = document.querySelector('.calculator input');
-const buttons = document.querySelectorAll('.calculator .btn');
+const display = document.querySelector('#display');
+const buttons = document.querySelectorAll('.btn');
 
 function appendNumber(number) {
     if (number === '.' && display.value.includes('.')) return;
-    display.value += number;
+    display.value = display.value === '0' ? number : display.value + number;
 }
 
 function calculate() {
     try {
-        display.value = eval(display.value);
+        display.value = eval(display.value.replace(/x/g, '*').replace(/÷/g, '/'));
     } catch {
         display.value = 'Error';
     }
@@ -17,6 +17,14 @@ function calculate() {
 function clearDisplay() {
     display.value = '';
 }
+
+function updateButtonValues() {
+    buttons.forEach(button => {
+        button.setAttribute('data-value', button.textContent);
+    });
+}
+
+updateButtonValues(); // 初始化按钮值
 
 buttons.forEach(button => {
     button.addEventListener('click', () => {
@@ -35,4 +43,11 @@ buttons.forEach(button => {
                 appendNumber(value);
         }
     });
+});
+
+// 监听键盘输入
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        calculate();
+    }
 });
