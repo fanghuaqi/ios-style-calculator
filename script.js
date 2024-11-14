@@ -2,42 +2,35 @@ const display = document.querySelector('#display');
 const buttons = document.querySelectorAll('.btn');
 
 function appendNumber(number) {
-    if (number === '.' && display.value.includes('.')) return;
-    display.value = display.value === '0' ? number : display.value + number;
+    if (display.value === 'Error') {
+        display.value = ''; // 清除错误信息
+    }
+    display.value += number;
 }
 
 function calculate() {
     try {
-        display.value = eval(display.value.replace(/x/g, '*').replace(/÷/g, '/'));
+        // 将 'x' 替换为 '*' 进行计算
+        const expression = display.value.replace(/x/g, '*');
+        display.value = eval(expression);
     } catch {
-        display.value = 'Error';
+        display.value = 'Error'; // 捕获错误并显示
     }
 }
 
 function clearDisplay() {
-    display.value = '';
+    display.value = ''; // 清空显示
 }
-
-function updateButtonValues() {
-    buttons.forEach(button => {
-        button.setAttribute('data-value', button.textContent);
-    });
-}
-
-updateButtonValues(); // 初始化按钮值
 
 buttons.forEach(button => {
     button.addEventListener('click', () => {
-        const value = button.getAttribute('data-value');
+        const value = button.textContent; // 使用按钮的文本内容
         switch (value) {
             case 'C':
                 clearDisplay();
                 break;
             case '=':
                 calculate();
-                break;
-            case '.':
-                appendNumber('.');
                 break;
             default:
                 appendNumber(value);
@@ -47,7 +40,13 @@ buttons.forEach(button => {
 
 // 监听键盘输入
 document.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-        calculate();
+    if (e.key >= 0 && e.key <= 9) {
+        appendNumber(e.key); // 数字键
+    } else if (e.key === 'Enter') {
+        calculate(); // 回车键
+    } else if (e.key === 'Backspace') {
+        clearDisplay(); // 清除
+    } else if (['+', '-', '*', '/'].includes(e.key)) {
+        appendNumber(e.key); // 运算符
     }
 });
